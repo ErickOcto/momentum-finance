@@ -6,8 +6,9 @@ import (
 
 // Config holds all config variables loaded from environment variables
 type Config struct {
-	Port        string
-	DatabaseURL string
+	Port         string
+	DatabaseURL  string
+	ClerkJWKSURL string
 }
 
 // LoadConfig reads configuration from the environment
@@ -18,9 +19,11 @@ func LoadConfig() *Config {
 	}
 
 	dbURL := os.Getenv("DATABASE_URL")
+	jwksURL := os.Getenv("CLERK_JWKS_URL")
 
 	return &Config{
-		Port:        port,
-		DatabaseURL: dbURL,
+		Port:         port,
+		DatabaseURL:  dbURL,
+		ClerkJWKSURL: jwksURL,
 	}
 }

@@ -11,6 +11,7 @@ import (
 
 	"momentum-backend/internal/config"
 	"momentum-backend/internal/handlers"
+	"momentum-backend/internal/middleware"
 	"momentum-backend/internal/repositories"
 
 	"github.com/gofiber/fiber/v2"
@@ -24,6 +25,14 @@ func main() {
 	// 2. Load Configuration
 	cfg := config.LoadConfig()
 	logger.Info("configuration loaded", "port", cfg.Port)
+
+	// Configure JWKS URL for Clerk middleware
+	if cfg.ClerkJWKSURL != "" {
+		middleware.SetJWKSURL(cfg.ClerkJWKSURL)
+		logger.Info("Clerk JWKS URL configured", "url", cfg.ClerkJWKSURL)
+	} else {
+		logger.Warn("CLERK_JWKS_URL is not set; auth middleware requests will fail to initialize keys")
+	}
 
 	// 2b. Initialize Database Connection Pool
 	if cfg.DatabaseURL != "" {
@@ -47,6 +56,10 @@ func main() {
 
 	// 4. Register Routes
 	app.Get("/health", handlers.HealthCheckHandler)
+
+	// API Group
+	api := app.Group("/api/v1")
+	api.Get("/protected", middleware.ClerkAuthMiddleware(), handlers.ProtectedHandler)
 
 	// 5. Start Server in a Goroutine
 	serverErrors := make(chan error, 1)
