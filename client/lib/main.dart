@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:client/core/storage/local_storage.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  final localStorage = LocalStorageService();
+  await localStorage.init();
+
   runApp(
     const ProviderScope(
       child: MyApp(),
