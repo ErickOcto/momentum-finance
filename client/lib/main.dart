@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/core/storage/local_storage.dart';
+import 'package:client/core/auth/auth_service.dart';
+import 'package:client/features/auth/presentation/login_screen.dart';
+import 'package:client/features/auth/presentation/pin_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,11 +18,26 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authServiceProvider);
+
+    Widget getHomeScreen() {
+      switch (authState.status) {
+        case AuthStatus.unauthenticated:
+          return const LoginScreen();
+        case AuthStatus.needsPinSetup:
+          return const PinScreen(isSetup: true);
+        case AuthStatus.needsPinVerification:
+          return const PinScreen(isSetup: false);
+        case AuthStatus.authenticated:
+          return const DashboardSkeleton();
+      }
+    }
+
     return MaterialApp(
       title: 'Momentum Finance',
       debugShowCheckedModeBanner: false,
@@ -30,7 +48,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      home: const DashboardSkeleton(),
+      home: getHomeScreen(),
     );
   }
 }
@@ -44,6 +62,12 @@ class DashboardSkeleton extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Momentum Finance'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout_outlined),
+            onPressed: () => ref.read(authServiceProvider.notifier).logout(),
+          )
+        ],
       ),
       body: Center(
         child: Padding(
