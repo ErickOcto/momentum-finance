@@ -27,3 +27,9 @@
 
 ## 4. Response Protocol
 - Keep code explanations concise. Prioritize showing full, working code blocks over partial snippets or placeholders (`// TODO: implement later` is forbidden unless explicitly requested).
+
+## 5. Workflow & Git Protocol Compliance
+- You must read `workflow.md` to understand your task lifecycle boundaries.
+- Before beginning any coding assignment, ask the user: "Which GitHub Issue number are we working on right now?"
+- Never commit code directly to `main`. Always instruct the user or execute commands to create a specific `feature/` or `bugfix/` branch matching the assigned issue number.
+- When a task is complete, write a structured Pull Request description template matching the criteria in `workflow.md`.
