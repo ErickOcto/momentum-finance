@@ -71,6 +71,14 @@ func main() {
 	api.Post("/webhooks/clerk", handlers.ClerkWebhookHandler)
 	api.Get("/users/me", middleware.ClerkAuthMiddleware(), handlers.GetCurrentUserProfile)
 
+	// Wallet Routes
+	api.Get("/wallets", middleware.ClerkAuthMiddleware(), handlers.GetWallets)
+	api.Post("/wallets", middleware.ClerkAuthMiddleware(), handlers.CreateWallet)
+
+	// Cash Log Routes
+	api.Get("/cash-logs", middleware.ClerkAuthMiddleware(), handlers.GetCashLogs)
+	api.Post("/cash-logs", middleware.ClerkAuthMiddleware(), handlers.CreateCashLog)
+
 	// 5. Start Server in a Goroutine
 	serverErrors := make(chan error, 1)
 	go func() {
