@@ -1,0 +1,6 @@
+# Binaries
+backend/bin/
+backend/bin/api
+
+# OS Files
+.DS_Store
