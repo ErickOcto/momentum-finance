@@ -79,6 +79,9 @@ func main() {
 	api.Get("/cash-logs", middleware.ClerkAuthMiddleware(), handlers.GetCashLogs)
 	api.Post("/cash-logs", middleware.ClerkAuthMiddleware(), handlers.CreateCashLog)
 
+	// Receipt Scanner Routes
+	api.Post("/receipts/scan", middleware.ClerkAuthMiddleware(), handlers.ScanReceiptHandler)
+
 	// 5. Start Server in a Goroutine
 	serverErrors := make(chan error, 1)
 	go func() {
