@@ -34,6 +34,14 @@ func main() {
 		logger.Warn("CLERK_JWKS_URL is not set; auth middleware requests will fail to initialize keys")
 	}
 
+	// Configure Clerk Webhook Secret
+	if cfg.ClerkWebhookSecret != "" {
+		handlers.ClerkWebhookSecret = cfg.ClerkWebhookSecret
+		logger.Info("Clerk webhook signature verification enabled")
+	} else {
+		logger.Warn("CLERK_WEBHOOK_SECRET is not set; inbound webhooks will fail to verify")
+	}
+
 	// 2b. Initialize Database Connection Pool
 	if cfg.DatabaseURL != "" {
 		dbCtx, dbCancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -60,6 +68,8 @@ func main() {
 	// API Group
 	api := app.Group("/api/v1")
 	api.Get("/protected", middleware.ClerkAuthMiddleware(), handlers.ProtectedHandler)
+	api.Post("/webhooks/clerk", handlers.ClerkWebhookHandler)
+	api.Get("/users/me", middleware.ClerkAuthMiddleware(), handlers.GetCurrentUserProfile)
 
 	// 5. Start Server in a Goroutine
 	serverErrors := make(chan error, 1)
