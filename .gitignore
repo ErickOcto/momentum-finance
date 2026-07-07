@@ -4,3 +4,12 @@ backend/bin/api
 
 # OS Files
 .DS_Store
+
+# Node dependency directories
+node_modules/
+db/node_modules/
+
+# TypeScript/Build outputs
+dist/
+db/dist/
+
