@@ -20,6 +20,8 @@ type User struct {
 // UserRepository defines database operations for users
 type UserRepository interface {
 	GetByClerkID(ctx context.Context, clerkID string) (*User, error)
+	CreateUser(ctx context.Context, user *User) error
+	DeleteUserByClerkID(ctx context.Context, clerkID string) error
 }
 
 type pgUserRepository struct {
@@ -45,4 +47,26 @@ func (r *pgUserRepository) GetByClerkID(ctx context.Context, clerkID string) (*U
 		return nil, err
 	}
 	return &u, nil
+}
+
+// CreateUser inserts a new user record
+func (r *pgUserRepository) CreateUser(ctx context.Context, user *User) error {
+	query := `
+		INSERT INTO users (id, clerk_id, email, display_name, created_at, updated_at)
+		VALUES (gen_random_uuid(), $1, $2, $3, NOW(), NOW())
+		RETURNING id, created_at, updated_at
+	`
+	err := r.db.QueryRow(ctx, query, user.ClerkID, user.Email, user.DisplayName).
+		Scan(&user.ID, &user.CreatedAt, &user.UpdatedAt)
+	return err
+}
+
+// DeleteUserByClerkID removes user record by Clerk unique ID
+func (r *pgUserRepository) DeleteUserByClerkID(ctx context.Context, clerkID string) error {
+	query := `
+		DELETE FROM users 
+		WHERE clerk_id = $1
+	`
+	_, err := r.db.Exec(ctx, query, clerkID)
+	return err
 }
