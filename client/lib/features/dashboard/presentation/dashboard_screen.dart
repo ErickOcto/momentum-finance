@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/core/auth/auth_service.dart';
 import 'package:client/features/cash_log/data/cash_log_repository.dart';
 import 'package:client/features/cash_log/presentation/fast_log_sheet.dart';
+import 'package:client/features/receipt_scanner/presentation/receipt_scanner_flow.dart';
+import 'package:image_picker/image_picker.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -82,6 +84,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.document_scanner_outlined),
+            onPressed: () {
+              final flow = ReceiptScannerFlow(
+                ref: ref,
+                context: context,
+                wallets: _wallets,
+                onCompleted: _loadData,
+              );
+              flow.startScanFlow(ImageSource.gallery);
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout_outlined),
             onPressed: () => ref.read(authServiceProvider.notifier).logout(),
