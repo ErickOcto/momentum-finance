@@ -11,6 +11,7 @@ import (
 
 	"momentum-backend/internal/config"
 	"momentum-backend/internal/handlers"
+	"momentum-backend/internal/repositories"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -23,6 +24,21 @@ func main() {
 	// 2. Load Configuration
 	cfg := config.LoadConfig()
 	logger.Info("configuration loaded", "port", cfg.Port)
+
+	// 2b. Initialize Database Connection Pool
+	if cfg.DatabaseURL != "" {
+		dbCtx, dbCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		_, err := repositories.InitDB(dbCtx, cfg.DatabaseURL)
+		dbCancel()
+		if err != nil {
+			logger.Error("failed to initialize database connection pool", "error", err)
+			// For MVP/Robustness we don't crash the server, but log it so healthcheck fails
+		} else {
+			defer repositories.CloseDB()
+		}
+	} else {
+		logger.Warn("DATABASE_URL is not set; database connection pool skipped")
+	}
 
 	// 3. Initialize Fiber App
 	app := fiber.New(fiber.Config{

@@ -6,7 +6,8 @@ import (
 
 // Config holds all config variables loaded from environment variables
 type Config struct {
-	Port string
+	Port        string
+	DatabaseURL string
 }
 
 // LoadConfig reads configuration from the environment
@@ -16,7 +17,10 @@ func LoadConfig() *Config {
 		port = "8080"
 	}
 
+	dbURL := os.Getenv("DATABASE_URL")
+
 	return &Config{
-		Port: port,
+		Port:        port,
+		DatabaseURL: dbURL,
 	}
 }
