@@ -131,7 +131,7 @@ class AuthService extends StateNotifier<AuthState> {
 
   // Clears all stored auth keys
   Future<void> logout() async {
-    await _secureStorage.delete(key: 'clerk_token');
+    await _secureStorage.deleteAll();
     state = AuthState(status: AuthStatus.unauthenticated);
   }
 }
